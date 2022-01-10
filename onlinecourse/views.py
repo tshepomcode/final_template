@@ -1,7 +1,8 @@
+from django.http.response import Http404
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 # <HINT> Import any new Models here
-from .models import Course, Enrollment
+from .models import Course, Enrollment, Question, Choice
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -68,6 +69,14 @@ def check_if_enrolled(user, course):
         if num_results > 0:
             is_enrolled = True
     return is_enrolled
+
+# Question detail view
+def detail(request, question_id):
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist:
+        raise Http404("Question does not exist")
+    return render(request,'onlinecourse/course_detail_bootstrap.html', {'question': question})
 
 
 # CourseListView
