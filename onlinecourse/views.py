@@ -121,6 +121,7 @@ def enroll(request, course_id):
          # Redirect to show_exam_result with the submission id
 def submit(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
+    
     user = request.user
     enrollment = Enrollment.objects.get(user=user, course=course)
     submission = Submission.objects.create(enrollment=enrollment)
@@ -130,7 +131,7 @@ def submit(request, course_id):
         choice = Choice.objects.get(pk=choice_id)
         submission.choices.add(choice)
 
-    return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(submission.id, course_id,)))
+    return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(course_id,submission.id)))
 
 
 # <HINT> A example method to collect the selected choices from the exam form from the request object
@@ -151,17 +152,25 @@ def extract_answers(request):
         # For each selected choice, check if it is a correct answer or not
         # Calculate the total score
 def show_exam_result(request, course_id, submission_id):
-    # submission = get_object_or_404(Submission, pk=submission_id)
-    # course = get_object_or_404(Course, pk=course_id)
-    submission = Submission.objects.get(pk=submission_id)
-    course = Course.objects.get(pk=course_id)
+    course = get_object_or_404(Course, pk=course_id)
+    submission = get_object_or_404(Submission, pk=submission_id)
+    # submission = Submission.objects.get(pk=submission_id)
     correct_choice = 0
-    total_score = get_grades(course_id)
+    total_score = get_grades(course_id) * 10
     selected_choice_ids = []
     for choice in submission.choices.all():
         selected_choice_ids.append(choice.id)
         if(choice.is_correct):
             correct_choice += 1
+    print('total_score: ' + str(total_score))
+    print('correct_choice: ' + str(correct_choice))
+    print('selected_choice_ids: ' + str(selected_choice_ids))
+
+    correct_choice = correct_choice * 10
+
+    # print('total_score: ' + str(total_score))
+    # print('correct_choice: ' + str(correct_choice))
+    # print('selected_choice_ids: ' + str(selected_choice_ids))
     
     context = {
         'course': course,
