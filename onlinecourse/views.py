@@ -166,16 +166,19 @@ def show_exam_result(request, course_id, submission_id):
     print('correct_choice: ' + str(correct_choice))
     print('selected_choice_ids: ' + str(selected_choice_ids))
 
-    correct_choice = correct_choice * 10
+    percentage_score = ((correct_choice * 10) / total_score) * 100
+    correct_choice = int(percentage_score)
 
-    # print('total_score: ' + str(total_score))
-    # print('correct_choice: ' + str(correct_choice))
-    # print('selected_choice_ids: ' + str(selected_choice_ids))
+    print('total_score: ' + str(total_score))
+    print('correct_choice: ' + str(correct_choice))
+    print('selected_choice_ids: ' + str(selected_choice_ids))
+    print('score ' + str(correct_choice) + '/' + str(total_score))
     
     context = {
         'course': course,
         'selected_ids': selected_choice_ids,
-        'grade': total_score
+        'grade': total_score,
+        'correct': correct_choice
     }
 
     return render(request,'onlinecourse/exam_result_bootstrap.html', context)
