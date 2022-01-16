@@ -1,6 +1,7 @@
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.template import context
 # <HINT> Import any new Models here
 from .models import Course, Enrollment, Question, Choice, Submission
 from django.contrib.auth.models import User
@@ -154,31 +155,44 @@ def extract_answers(request):
 def show_exam_result(request, course_id, submission_id):
     course = get_object_or_404(Course, pk=course_id)
     submission = get_object_or_404(Submission, pk=submission_id)
+
     # submission = Submission.objects.get(pk=submission_id)
-    correct_choice = 0
-    total_score = get_grades(course_id) * 10
+    questions = course.question_set.all()
+
+    right_choice_answers = []
+    for question in questions:
+        for choice in question.choice_set.all():
+            if choice.is_correct:
+                right_choice_answers.append(choice.id)
+    
+    grade_score = 0
+    grade = get_grades(course_id) * 10
     selected_choice_ids = []
+
     for choice in submission.choices.all():
         selected_choice_ids.append(choice.id)
         if(choice.is_correct):
-            correct_choice += 1
-    print('total_score: ' + str(total_score))
-    print('correct_choice: ' + str(correct_choice))
-    print('selected_choice_ids: ' + str(selected_choice_ids))
+            grade_score += 1
 
-    percentage_score = ((correct_choice * 10) / total_score) * 100
-    correct_choice = int(percentage_score)
-
-    print('total_score: ' + str(total_score))
-    print('correct_choice: ' + str(correct_choice))
+    print('grade: ' + str(grade))
+    print('grade_score: ' + str(grade_score))
     print('selected_choice_ids: ' + str(selected_choice_ids))
-    print('score ' + str(correct_choice) + '/' + str(total_score))
+    print('right answers: ' + str(right_choice_answers))
+
+    percentage_score = ((grade_score * 10) / grade) * 100
+    grade_score = int(percentage_score)
+
+    print('grade: ' + str(grade))
+    print('grade_score: ' + str(grade_score))
+    print('selected_choice_ids: ' + str(selected_choice_ids))
+    print('score ' + str(grade_score) + '/' + str(grade))
     
     context = {
         'course': course,
         'selected_ids': selected_choice_ids,
-        'grade': total_score,
-        'correct': correct_choice
+        'grade': grade,
+        'score': grade_score,
+        'right_answers': right_choice_answers
     }
 
     return render(request,'onlinecourse/exam_result_bootstrap.html', context)
