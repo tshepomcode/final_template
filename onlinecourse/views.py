@@ -174,19 +174,10 @@ def show_exam_result(request, course_id, submission_id):
         if(choice.is_correct):
             grade_score += 1
 
-    print('grade: ' + str(grade))
-    print('grade_score: ' + str(grade_score))
-    print('selected_choice_ids: ' + str(selected_choice_ids))
-    print('right answers: ' + str(right_choice_answers))
-
     percentage_score = ((grade_score * 10) / grade) * 100
     grade_score = int(percentage_score)
 
-    print('grade: ' + str(grade))
-    print('grade_score: ' + str(grade_score))
-    print('selected_choice_ids: ' + str(selected_choice_ids))
-    print('score ' + str(grade_score) + '/' + str(grade))
-    
+  
     context = {
         'course': course,
         'selected_ids': selected_choice_ids,
